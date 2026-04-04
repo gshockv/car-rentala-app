@@ -1,4 +1,4 @@
-package net.carent.reservation.rental;
+package net.carent.common;
 
 import java.time.LocalDate;
 

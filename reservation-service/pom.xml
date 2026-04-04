@@ -32,10 +32,18 @@
   </dependencyManagement>
 
   <dependencies>
+
+    <dependency>
+      <groupId>net.carent</groupId>
+      <artifactId>common-staff</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-arc</artifactId>
     </dependency>
+
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-rest</artifactId>

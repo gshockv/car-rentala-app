@@ -5,6 +5,7 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import net.carent.common.Rental;
 
 import java.time.LocalDate;
 import java.util.concurrent.atomic.AtomicLong;
