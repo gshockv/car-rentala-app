@@ -1,0 +1,35 @@
+{@net.carent.users.model.Reservation[] reservations}
+
+<div id="listOfReservations">
+  <table class="table table-bordered table-striped table-hover">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Car ID</th>
+        <th>Start Day</th>
+        <th>End Day</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {#for r in reservations}
+        <tr>
+          <td>
+            {r.id}
+          </td>
+          <td>
+            {r.carId}
+          </td>
+          <td>
+            {r.startDay}
+          </td>
+          <td>
+            {r.endDay}
+          </td>
+        </tr>
+      {/for}
+
+    </tbody>
+
+  </table>
+</div>

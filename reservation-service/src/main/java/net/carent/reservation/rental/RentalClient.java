@@ -2,7 +2,7 @@ package net.carent.reservation.rental;
 
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
-import net.carent.common.Rental;
+import net.carent.reservation.model.Rental;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 import org.jboss.resteasy.reactive.RestPath;
 

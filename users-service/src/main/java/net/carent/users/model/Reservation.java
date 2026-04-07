@@ -1,4 +1,4 @@
-package net.carent.reservation.model;
+package net.carent.users.model;
 
 import java.time.LocalDate;
 

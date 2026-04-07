@@ -6,7 +6,6 @@ import io.quarkus.test.junit.QuarkusMock;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import net.bytebuddy.asm.Advice;
 import net.carent.reservation.inventory.GraphQLInventoryClient;
 import net.carent.reservation.model.Car;
 import net.carent.reservation.model.Reservation;
