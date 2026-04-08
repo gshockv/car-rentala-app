@@ -2,7 +2,7 @@ package net.carent.reservation;
 
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
-import net.carent.reservation.model.Reservation;
+import net.carent.reservation.entity.Reservation;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

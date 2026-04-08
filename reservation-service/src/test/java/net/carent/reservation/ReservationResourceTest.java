@@ -8,7 +8,7 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import net.carent.reservation.inventory.GraphQLInventoryClient;
 import net.carent.reservation.model.Car;
-import net.carent.reservation.model.Reservation;
+import net.carent.reservation.entity.Reservation;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 

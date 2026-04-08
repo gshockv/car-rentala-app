@@ -1,0 +1,47 @@
+version: '3.7'
+
+services:
+  car-rent-postgres:
+    container_name: car-rent-postgres
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - ./init:/docker-entrypoint-initdb.d
+    ports:
+      - 5432:5432
+    networks:
+      - local_cluster_network
+
+  car-rent-keycloak:
+    container_name: car-rent-keycloak
+    image: quay.io/keycloak/keycloak:25.0.6
+    user: "${UID}"
+    volumes:
+      - "./init/car-rental-realm.json:/opt/keycloak/data/import/car-rental-realm.json:Z"
+    command:
+      - start-dev
+      - --import-realm
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://car-rent-postgres/keycloak_db
+      KC_DB_USERNAME: keycloak_service
+      KC_DB_PASSWORD: keycloak_password
+    ports:
+      - 7777:8080
+    restart: always
+    depends_on:
+      - car-rent-postgres
+    networks:
+      - local_cluster_network
+
+networks:
+  local_cluster_network:
+    driver: bridge
+
+volumes:
+  car-rent-postgres-data:

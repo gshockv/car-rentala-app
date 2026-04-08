@@ -10,7 +10,7 @@ import net.carent.reservation.inventory.GraphQLInventoryClient;
 import net.carent.reservation.inventory.InventoryClient;
 import net.carent.reservation.model.Car;
 import net.carent.reservation.model.Rental;
-import net.carent.reservation.model.Reservation;
+import net.carent.reservation.entity.Reservation;
 import net.carent.reservation.rental.RentalClient;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.resteasy.reactive.RestQuery;
