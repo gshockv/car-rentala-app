@@ -1,6 +1,0 @@
-quarkus:
-  http:
-    port: 8081
-    test-port: 8181
-
-  oidc:

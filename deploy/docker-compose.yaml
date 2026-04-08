@@ -9,6 +9,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     volumes:
+      - carent_postgres_data:/var/lib/postgresql/data
       - ./init:/docker-entrypoint-initdb.d
     ports:
       - 5432:5432
@@ -44,4 +45,4 @@ networks:
     driver: bridge
 
 volumes:
-  car-rent-postgres-data:
+  carent_postgres_data:

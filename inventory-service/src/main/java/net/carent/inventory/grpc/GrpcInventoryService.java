@@ -2,33 +2,36 @@ package net.carent.inventory.grpc;
 
 import io.quarkus.grpc.GrpcService;
 import io.quarkus.logging.Log;
+import io.smallrye.common.annotation.Blocking;
 import io.smallrye.mutiny.Uni;
 import jakarta.inject.Inject;
-import net.carent.inventory.database.CarInventory;
+import jakarta.transaction.Transactional;
 import net.carent.inventory.model.*;
+import net.carent.inventory.repository.CarRepository;
 
 import java.util.Optional;
 
 @GrpcService
 public class GrpcInventoryService implements InventoryService {
-  private final CarInventory inventory;
+  private final CarRepository carRepository;
 
   @Inject
-  public GrpcInventoryService(CarInventory inventory) {
-    this.inventory = inventory;
+  public GrpcInventoryService(CarRepository carRepository) {
+    this.carRepository = carRepository;
   }
 
   @Override
+  @Blocking
+  @Transactional
   public Uni<CarResponse> add(InsertCardRequest request) {
     Car car = new Car();
     car.licensePlateNumber = request.getLicensePlateNumber();
     car.manufacturer = request.getManufacturer();
     car.model = request.getModel();
-    car.id = CarInventory.ids.incrementAndGet();
 
     Log.info("Persisting car: " + car);
 
-    inventory.getCars().add(car);
+    carRepository.persist(car);
 
     return Uni.createFrom().item(
       CarResponse.newBuilder()
@@ -65,15 +68,15 @@ public class GrpcInventoryService implements InventoryService {
 //  }
 
   @Override
+  @Blocking
+  @Transactional
   public Uni<CarResponse> remove(RemoveCarRequest request) {
-    Optional<Car> optionalCar = inventory.getCars().stream()
-      .filter(car ->
-        request.getLicensePlateNumber().equals(car.licensePlateNumber))
-      .findFirst();
+    Optional<Car> toBeRemoved = carRepository.findByLicensePlateNumberOptional(
+      request.getLicensePlateNumber());
 
-    if (optionalCar.isPresent()) {
-      Car removedCar = optionalCar.get();
-      inventory.getCars().remove(removedCar);
+    if (toBeRemoved.isPresent()) {
+      Car removedCar = toBeRemoved.get();;
+      carRepository.delete(removedCar);
 
       return Uni.createFrom().item(CarResponse.newBuilder()
         .setLicensePlateNumber(removedCar.licensePlateNumber)
