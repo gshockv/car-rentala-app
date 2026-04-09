@@ -12,7 +12,7 @@ services:
       - carent_postgres_data:/var/lib/postgresql/data
       - ./init:/docker-entrypoint-initdb.d
     ports:
-      - 5432:5432
+      - "5432:5432"
     networks:
       - local_cluster_network
 
@@ -33,12 +33,22 @@ services:
       KC_DB_USERNAME: keycloak_service
       KC_DB_PASSWORD: keycloak_password
     ports:
-      - 7777:8080
+      - "7777:8080"
     restart: always
     depends_on:
       - car-rent-postgres
     networks:
       - local_cluster_network
+
+  carent-mongo:
+    container_name: carent-mongo
+    image: mongo:8
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - carent_mongodb_data:/data/db
+
 
 networks:
   local_cluster_network:
@@ -46,3 +56,4 @@ networks:
 
 volumes:
   carent_postgres_data:
+  carent_mongodb_data:
