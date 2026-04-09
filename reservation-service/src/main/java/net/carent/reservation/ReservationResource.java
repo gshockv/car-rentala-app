@@ -1,7 +1,10 @@
 package net.carent.reservation;
 
+import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
+import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.quarkus.logging.Log;
 import io.smallrye.graphql.client.GraphQLClient;
+import io.smallrye.mutiny.Uni;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
@@ -21,6 +24,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Path("reservation")
 @Produces(MediaType.APPLICATION_JSON)
@@ -41,51 +45,60 @@ public class ReservationResource {
 
   @GET
   @Path("all")
-  public Collection<Reservation> allReservations() {
+  public Uni<Collection<Reservation>> allReservations() {
     String userId = securityContext.getUserPrincipal() != null ?
       securityContext.getUserPrincipal().getName() : null;
 
-    return Reservation.<Reservation>streamAll()
-      .filter(reserv -> userId == null || userId.equals(reserv.userId))
-      .toList();
+    return Reservation.<Reservation>listAll()
+      .onItem()
+      .transform(reservations ->
+        reservations.stream()
+          .filter(r -> userId == null || userId.equals(r.userId))
+          .toList()
+      );
   }
 
   @GET
   @Path("availability")
-  public Collection<Car> availability(@RestQuery LocalDate startDate,
+  public Uni<Collection<Car>> availability(@RestQuery LocalDate startDate,
                                       @RestQuery LocalDate endDate) {
-    List<Car> availableCars = inventoryClient.allCars();
-    Map<Long, Car> carsById = new HashMap<>();
-    availableCars.forEach(car -> {
-      carsById.put(car.id, car);
-    });
+    Uni<List<Car>> allCarsUni = inventoryClient.allCars();
+    Uni<List<Reservation>> reservationsUni = Reservation.listAll();
 
-    // get all current reservations
-    List<Reservation> reservations = Reservation.listAll();
-    reservations.forEach(reserv -> {
-      if (reserv.isReserved(startDate, endDate)) {
-        carsById.remove(reserv.carId);
-      }
-    });
-    return carsById.values();
+    return Uni.combine().all().unis(allCarsUni, reservationsUni)
+      .with((availableCars, reservations) -> {
+        Map<Long, Car> carsById = new HashMap<>();
+        for (var car : availableCars) {
+          carsById.put(car.id, car);
+        }
+
+        for (var reservation : reservations) {
+          if (reservation.isReserved(startDate, endDate)) {
+            carsById.remove(reservation.carId);
+          }
+        }
+        return carsById.values();
+      });
   }
 
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
-  @Transactional
-  public Reservation make(Reservation reservation) {
+  @WithTransaction
+  public Uni<Reservation> make(Reservation reservation) {
     reservation.userId = securityContext.getUserPrincipal() != null ?
       securityContext.getUserPrincipal().getName() : "anonymous";
 
-    reservation.persist();
+    return reservation.<Reservation>persist().onItem()
+      .call(persisted -> {
+        Log.info("Successfully reserved reservation " + persisted);
 
-    Log.info("Successfully reserved reservation " + reservation);
-
-    if (reservation.startDay.equals(LocalDate.now())) {
-      Rental rental = rentalClient.start(reservation.userId, reservation.id);
-      Log.info("Successfully started rental: " + rental);
-    }
-
-    return reservation;
+        if (persisted.startDay.equals(LocalDate.now())) {
+          return rentalClient.start(persisted.userId, persisted.id)
+            .onItem().invoke(rental ->
+              Log.info("Successfully started rental: " + rental)
+            ).replaceWith(persisted);
+        }
+        return Uni.createFrom().item(persisted);
+      });
   }
 }

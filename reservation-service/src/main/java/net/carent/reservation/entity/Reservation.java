@@ -1,6 +1,6 @@
 package net.carent.reservation.entity;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import io.quarkus.hibernate.reactive.panache.PanacheEntity;
 import jakarta.persistence.Entity;
 
 import java.time.LocalDate;
@@ -18,9 +18,9 @@ public class Reservation extends PanacheEntity {
     return (!(this.endDay.isBefore(startDay) || this.startDay.isAfter(endDay)));
   }
 
-  public static List<Reservation> findByCar(Long carId) {
-    return list("carId", carId);
-  }
+//  public static List<Reservation> findByCar(Long carId) {
+//    return list("carId", carId);
+//  }
 
   @Override
   public String toString() {

@@ -1,5 +1,6 @@
 package net.carent.reservation.rental;
 
+import io.smallrye.mutiny.Uni;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import net.carent.reservation.model.Rental;
@@ -11,5 +12,5 @@ import org.jboss.resteasy.reactive.RestPath;
 public interface RentalClient {
   @POST
   @Path("/start/{userId}/{reservationId}")
-  Rental start(@RestPath String userId, @RestPath Long reservationId);
+  Uni<Rental> start(@RestPath String userId, @RestPath Long reservationId);
 }

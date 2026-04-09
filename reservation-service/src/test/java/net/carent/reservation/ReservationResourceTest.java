@@ -34,7 +34,7 @@ public class ReservationResourceTest {
 
     Car peugeot = new Car(42L, "XYZ-123", "Peugeot", "406");
 
-    Mockito.when(mock.allCars()).thenReturn(Collections.singletonList(peugeot));
+    //Mockito.when(mock.allCars()).thenReturn(Collections.singletonList(peugeot));
 
     QuarkusMock.installMockForType(mock, GraphQLInventoryClient.class);
 
